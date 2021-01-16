@@ -27,3 +27,4 @@ You can find me on:
 - [Linkedin](https://id.linkedin.com/in/%F0%9F%94%8Cvalian-masdani-67736215b)
 - [Facebook](https://www.facebook.com/valianmasdani/)
 - [Email](mailto:valianmasdani@gmail.com) (valianmasdani@gmail.com)
+- [Youtube](https://www.youtube.com/user/ValianTheRELover/featured)
