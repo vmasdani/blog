@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://vmasdani.my.id/sitemap.xml
