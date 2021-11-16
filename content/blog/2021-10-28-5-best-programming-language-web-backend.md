@@ -78,7 +78,7 @@ myVar := 0
 
 If you have written Python before, you might notice that variable declaration is the same in both python and go, just write the variable name and then assign it to a value, like `myVar := 0`. But the difference is that Go **infers** the variable type of a value, meaning that Go knows the type of the value zero (0) and will automatically assign zero as `int`. This is a modern programming language compiler technique called [Type inference](https://en.wikipedia.org/wiki/Type_inference), while Python uses [Duck typing](https://en.wikipedia.org/wiki/Duck_typing).
 
-Creating a HTTP server with router is very easy in Golang. Using the `gorilla/mux` package, we can write a REST server backbone as simple as this:
+Creating an HTTP server with router is very easy in Golang. Using the `gorilla/mux` package, we can write a barebone REST server as simple as this:
 
 ```go
 package main
@@ -117,6 +117,7 @@ if err != nil {
 
 fmt.Println("Your number:", num)
 ```
+
 This seems to work really well, protects your program from unnecessarily hair-pulling bugs and is very convenient so that errors can be caught early in compile-time. However, if you have **many functions that has error return values**, you have to write something like this:
 
 ```go
@@ -141,17 +142,20 @@ if err != nil {
    panic("Error doing another thing to num!" )
 }
 ```
+
 So many `if err != nil`!
 
 2. **Lack of `map, filter, reduce, foreach` in built-in golang std library**  
-Golang **does not have** the map, reduce, filter, foreach functionality in its std library. Which is a bit of a dealbreaker for me because most modern programming language has this feature, I tried very hard to adapt to the fact that golang does not have these features in the language, but I just could not get comfortable with the fact to this date.
+   Golang **does not have** the map, reduce, filter, foreach functionality in its std library. Which is a bit of a dealbreaker for me because most modern programming language has this feature, I tried very hard to adapt to the fact that golang does not have these features in the language, but I just could not get comfortable with the fact to this date.
 
 In Javascript/Typescript, you can easily do this:
+
 ```js
-employees.find((e) => e.id === selectedId)?.name
+employees.find((e) => e.id === selectedId)?.name;
 ```
 
 But in Go, since there is no `Find(arr, func)` function built into the language, I have to manually loop for each items and break if I found the item.
+
 ```go
 var employee Employee
 var found = false
@@ -169,8 +173,36 @@ if found {
 }
 ```
 
-3. **Lack of generics**
+3. **Lack of generics**  
+   One of the programming principle that you should hold dear is **DRY**, a.ka. **Don't Repeat Yourself**, which means tedious tasks should be minimized as much as possible by utilizing the power of a programming language. One of the concepts used for reducing code repetition is **generics**.  
+   Generics allow you to define **types** to programming elements such as functions or classes so that th element can behave according to the type you have defined.  
+   For example, if you want to create a function which serializes an object to indented JSON in Dart, you can write this:
 
+```dart
+String serializeIndented<T>(T json) {
+  return JsonEncoder.withIndent(" ").convert(json);
+}
+
+// invocation
+serializeIndented<Person>(person);
+
+// or by type inference
+serializeIndented(person);
+
+```
+
+But in Go, you can't supply a generic. Instead, you have to rely on **empty interfaces** which is basically a dynamic type that you can cast.
+
+```go
+func SerializeIndented(i interface{}) ([]byte, error) {
+   return json.MarshalIndent(i, "", " ")
+}
+
+// invocation
+ser, err := Serialize(person)
+```
+
+Works, but really uncomfortable to use in big projects which has many complex types.
 
 ## 4. Spring Boot + Kotlin
 
@@ -179,6 +211,91 @@ if found {
 - **Paradigm**: multi paradigm, mainly object oriented
 
 If you are looking for a "powerful" web backend solution which has been around for a long time and you want to build an enterprise web application for very cheap, enter Spring and Kotlin.
+
+Spring boot is a very mature open source web framework which runs on top of the [JVM (Java Virtual Machine)](https://en.wikipedia.org/wiki/Java_virtual_machine) and is developed by the team at VMWare. It provides a complete solution for building web applications and utilizes modern web technologies such as **HATEOAS** & **microservices gateway** (Netflix Zuul & Eureka server) for data processing/presentation, and server templating engine such as [Thymeleaf](https://www.thymeleaf.org/) or [JSP](https://www.thymeleaf.org/).
+
+While primarily designed for **Java** in the userland aspect, **Kotlin** support in Spring Boot is fantastic. I think what the Java flavored Spring/Spring Boot framework lacks is modern programming language features like type inference, null safety, immutable struct/classes/variables, declarative queries, expression-based syntax etc in which Kotlin has all of them.
+
+On top of the modern programming language features, Kotlin has 100% interoperability with Java, which makes Spring Boot also 100% compatible with Kotlin!
+
+Here's how a Spring Boot REST API project in Kotlin typically looks like:
+
+- Model
+
+```kotlin
+@Entity
+data class Person(
+   @Id
+   @GeneratedValue(strategy=GenerationType.AUTO)
+   var id: Long? = null,
+   var name: String? = null,
+
+   @ManyToOne
+   var department: Department? = null,
+
+   @CreationTimestamp
+   var createdAt: Instant? = null
+   @UpdateTimestamp
+   var updatedAt: Instant? = null
+)
+```
+
+- Repository
+```kotlin
+interface PersonRepository : JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
+}
+```
+
+- Controller
+```kotlin
+@RestController
+class PersonController(
+   private val environment: Environment,
+   private val personRepository : PersonRepository
+) {
+   @GetMapping("/people") 
+   fun all() = personRepository.findAll()
+
+   @GetMapping("/people/{id}") 
+   fun get(@PathVariable id: Long) = personRepository.findById(id)
+   
+   @PostMapping("/people") 
+   fun post(@RequestBody person: Person) 
+      = ResponseEntity.status(HttpStatus.CREATED).body(personRepository.save(person)) 
+}
+```
+
+Writing Spring Boot in Kotlin is very productive. Many of the reasons are because of:
+- **function return inference** which can lead to writing very concise controller functions.  
+- **dataclasses**
+which enables you to create a struct/record data type without **getters** and **setters**. Although you can generate getters and setters through most JVM-based IDEs like **IntelliJ Idea Community** and **Eclipse IDE**, not having to write getters and setters is very intuitive and not time-consuming.
+- **declarative utility functions** such as **map, filter, fold** which Java does not have, and makes writing loops very, very concise.
+```kotlin
+// find something in array
+val found = people.find { p -> p.id == selectedID }
+
+// filter people more than 22 years old
+val ageTwentyTwo = people.filter { p -> p.age > 22 }
+
+// map people's ages
+val onlyAges = people.map { p -> p.age }
+
+```
+
+Lastly, one of the most important benefit of writing in Kotlin is **null safety**. Rolling-release project model which has very fast-changing RDBMS is very prone to error, and the data that is returned from the RDBMS might not always have a value, which might be a result of **column update**. But the null safety feature in Kotlin prevents your program from getting a random **null pointer exception** which you might will often encounter while writing Java due to Java not having nullable types, so it assumes that every variables are nullable by default, so you can't accidentally unpack a property which is actually **null** while writing Kotlin.
+
+Pros & Cons of Kotlin + Spring:  
+
+**Pros:**
+1. 1
+2. 2
+3. 3
+
+**Cons:**
+1. 1
+2. 2
+3. 3
+
 
 ## 3. Typescript Node
 
