@@ -30,11 +30,102 @@ Why **can't you**? Because there are always a few considerations in picking a pr
 
 And now we are going to be reviewing 5 top programming languages according to the considerations above which works best for backend web programming.
 
-## 5. Golang
+## 4. Spring Boot + Kotlin
+
+- **Typing**: Strong, static
+- **Founder**: Jetbrains (Kotlin), VMWare (Spring)
+- **Paradigm**: multi paradigm, mainly object oriented
+
+If you are looking for a "powerful" web backend solution which has been around for a long time and you want to build an enterprise web application for very cheap, enter Spring and Kotlin.
+
+Spring boot is a very mature open source web framework which runs on top of the [JVM (Java Virtual Machine)](https://en.wikipedia.org/wiki/Java_virtual_machine) and is developed by the team at VMWare. It provides a complete solution for building web applications and utilizes modern web technologies such as **HATEOAS** & **microservices gateway** (Netflix Zuul & Eureka server) for data processing/presentation, and server templating engine such as [Thymeleaf](https://www.thymeleaf.org/) or [JSP](https://www.thymeleaf.org/).
+
+While primarily designed for **Java** in the userland aspect, **Kotlin** support in Spring Boot is fantastic. I think what the Java flavored Spring/Spring Boot framework lacks is modern programming language features like type inference, null safety, immutable struct/classes/variables, declarative queries, expression-based syntax etc in which Kotlin has all of them.
+
+On top of the modern programming language features, Kotlin has 100% interoperability with Java, which makes Spring Boot also 100% compatible with Kotlin!
+
+Here's how a Spring Boot REST API project in Kotlin typically looks like:
+
+- Model
+
+```kotlin
+@Entity
+data class Person(
+   @Id
+   @GeneratedValue(strategy=GenerationType.AUTO)
+   var id: Long? = null,
+   var name: String? = null,
+
+   @ManyToOne
+   var department: Department? = null,
+
+   @CreationTimestamp
+   var createdAt: Instant? = null
+   @UpdateTimestamp
+   var updatedAt: Instant? = null
+)
+```
+
+- Repository
+
+```kotlin
+interface PersonRepository : JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
+}
+```
+
+- Controller
+
+```kotlin
+@RestController
+class PersonController(
+   private val environment: Environment,
+   private val personRepository : PersonRepository
+) {
+   @GetMapping("/people")
+   fun all() = personRepository.findAll()
+
+   @GetMapping("/people/{id}")
+   fun get(@PathVariable id: Long) = personRepository.findById(id)
+
+   @PostMapping("/people")
+   fun post(@RequestBody person: Person)
+      = ResponseEntity.status(HttpStatus.CREATED).body(personRepository.save(person))
+}
+```
+
+Writing Spring Boot in Kotlin is very productive. Many of the reasons are because of:
+
+- **function return inference** which can lead to writing very concise controller functions.
+- **dataclasses**
+  which enables you to create a struct/record data type without **getters** and **setters**. Although you can generate getters and setters through most JVM-based IDEs like **IntelliJ Idea Community** and **Eclipse IDE**, not having to write getters and setters is very intuitive and not time-consuming.
+- **declarative utility functions** such as **map, filter, fold** which Java does not (natively) have, and makes writing loops very, very concise.
+
+```kotlin
+// find something in array
+val found = people.find { p -> p.id == selectedID }
+
+// filter people more than 22 years old
+val ageTwentyTwo = people.filter { p -> p.age > 22 }
+
+// map people's ages
+val onlyAges = people.map { p -> p.age }
+
+```
+
+- Lastly, one of the most important benefit of writing in Kotlin is **null safety**. Rolling-release project model which has very fast-changing RDBMS is very prone to error, and the data that is returned from the RDBMS might not always have a value, which might be a result of **column update**. But the null safety feature in Kotlin prevents your program from getting a random **null pointer exception** which you might will often encounter while writing Java due to Java not having nullable types, so it assumes that every variables are nullable by default, so you can't accidentally unpack a property which is actually **null** while writing Kotlin.
+
+However, as good as Spring + Kotlin is, I would not choose Spring + Kotlin or any JVM based runtime to create a new web-based project these days, because of:
+
+1. **Memory constraints**: JVM apps are notorious for having very big memory usage
+2. **Asynchronous routines not first-class**. Although Kotlin has a neat green threads/coroutines system in the `kotlinx` library, Spring/Spring Boot does not natively support them, and setting them up is painful if you are not used to JVM project management system such as Gradle/Maven
+
+If you or your company already has a Spring Boot project with Java, I really, really recommend migrating to Kotlin because the developer experience and productivity is like night and day.
+
+## 4. Golang
 
 - **Typing**: Strong, static
 - **Founder**: Google
-- **Paradigm**: multi paradigm, mainly functional
+- **Paradigm**: multi paradigm, mainly functional & imperative
 
 Golang is a relatively new programming language made by Google. Its original purpose was to replace C/C++ for some parts of internal Google code because there were too much boilerplate and the codebase was becoming too verbose. It has now become one of the most used programming language for web backend and CLI tools such as big companies, project, and/or services like Docker, Gojek, Kubernetes, yay (arch linux AUR helper) etc.
 
@@ -173,8 +264,31 @@ if found {
 }
 ```
 
+Or you can use the [go-funk](https://github.com/thoas/go-funk) utility library:
+
+```go
+import (
+	"fmt"
+
+	"github.com/thoas/go-funk"
+)
+
+...
+
+r, ok := funk.Find(employees, func(e Employee) bool {
+   return e.Name == "Valian"
+}).(Employee)
+
+if !ok {
+   fmt.Println("Employee not found.")
+   return
+}
+
+fmt.Println("Employee found", r)
+```
+
 3. **Lack of generics**  
-   One of the programming principle that you should hold dear is **DRY**, a.ka. **Don't Repeat Yourself**, which means tedious tasks should be minimized as much as possible by utilizing the power of a programming language. One of the concepts used for reducing code repetition is **generics**.  
+   One of the programming principle that you should hold dear is **DRY**, a.k.a. **Don't Repeat Yourself**, which means tedious tasks should be minimized as much as possible by utilizing the power of a programming language whenever possible. One of the concepts used for reducing code repetition is **generics**.  
    Generics allow you to define **types** to programming elements such as functions or classes so that th element can behave according to the type you have defined.  
    For example, if you want to create a function which serializes an object to indented JSON in Dart, you can write this:
 
@@ -204,106 +318,99 @@ ser, err := Serialize(person)
 
 Works, but really uncomfortable to use in big projects which has many complex types.
 
-## 4. Spring Boot + Kotlin
+Despite all these cons, Go is a really, really nice language which balances between developer experience which makes writing code fast and safe, but also does not compromise performance--meaning that code written in Go is really fast, and very robust if your error handling game is played correctly. Memory usage is very lightweight too with Go. Definitely a correct option to pick Go for creating new projects in 2021. However, there are still many languages I haven't mentioned which you should really consider before picking Go.
 
-- **Typing**: Strong, static
-- **Founder**: Jetbrains (Kotlin), VMWare (Spring)
-- **Paradigm**: multi paradigm, mainly object oriented
-
-If you are looking for a "powerful" web backend solution which has been around for a long time and you want to build an enterprise web application for very cheap, enter Spring and Kotlin.
-
-Spring boot is a very mature open source web framework which runs on top of the [JVM (Java Virtual Machine)](https://en.wikipedia.org/wiki/Java_virtual_machine) and is developed by the team at VMWare. It provides a complete solution for building web applications and utilizes modern web technologies such as **HATEOAS** & **microservices gateway** (Netflix Zuul & Eureka server) for data processing/presentation, and server templating engine such as [Thymeleaf](https://www.thymeleaf.org/) or [JSP](https://www.thymeleaf.org/).
-
-While primarily designed for **Java** in the userland aspect, **Kotlin** support in Spring Boot is fantastic. I think what the Java flavored Spring/Spring Boot framework lacks is modern programming language features like type inference, null safety, immutable struct/classes/variables, declarative queries, expression-based syntax etc in which Kotlin has all of them.
-
-On top of the modern programming language features, Kotlin has 100% interoperability with Java, which makes Spring Boot also 100% compatible with Kotlin!
-
-Here's how a Spring Boot REST API project in Kotlin typically looks like:
-
-- Model
-
-```kotlin
-@Entity
-data class Person(
-   @Id
-   @GeneratedValue(strategy=GenerationType.AUTO)
-   var id: Long? = null,
-   var name: String? = null,
-
-   @ManyToOne
-   var department: Department? = null,
-
-   @CreationTimestamp
-   var createdAt: Instant? = null
-   @UpdateTimestamp
-   var updatedAt: Instant? = null
-)
-```
-
-- Repository
-```kotlin
-interface PersonRepository : JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
-}
-```
-
-- Controller
-```kotlin
-@RestController
-class PersonController(
-   private val environment: Environment,
-   private val personRepository : PersonRepository
-) {
-   @GetMapping("/people") 
-   fun all() = personRepository.findAll()
-
-   @GetMapping("/people/{id}") 
-   fun get(@PathVariable id: Long) = personRepository.findById(id)
-   
-   @PostMapping("/people") 
-   fun post(@RequestBody person: Person) 
-      = ResponseEntity.status(HttpStatus.CREATED).body(personRepository.save(person)) 
-}
-```
-
-Writing Spring Boot in Kotlin is very productive. Many of the reasons are because of:
-- **function return inference** which can lead to writing very concise controller functions.  
-- **dataclasses**
-which enables you to create a struct/record data type without **getters** and **setters**. Although you can generate getters and setters through most JVM-based IDEs like **IntelliJ Idea Community** and **Eclipse IDE**, not having to write getters and setters is very intuitive and not time-consuming.
-- **declarative utility functions** such as **map, filter, fold** which Java does not have, and makes writing loops very, very concise.
-```kotlin
-// find something in array
-val found = people.find { p -> p.id == selectedID }
-
-// filter people more than 22 years old
-val ageTwentyTwo = people.filter { p -> p.age > 22 }
-
-// map people's ages
-val onlyAges = people.map { p -> p.age }
-
-```
-
-Lastly, one of the most important benefit of writing in Kotlin is **null safety**. Rolling-release project model which has very fast-changing RDBMS is very prone to error, and the data that is returned from the RDBMS might not always have a value, which might be a result of **column update**. But the null safety feature in Kotlin prevents your program from getting a random **null pointer exception** which you might will often encounter while writing Java due to Java not having nullable types, so it assumes that every variables are nullable by default, so you can't accidentally unpack a property which is actually **null** while writing Kotlin.
-
-Pros & Cons of Kotlin + Spring:  
-
-**Pros:**
-1. 1
-2. 2
-3. 3
-
-**Cons:**
-1. 1
-2. 2
-3. 3
-
-
-## 3. Typescript Node
+## 3. Typescript NodeJS
 
 - **Typing**: Strong, static
 - **Founder**: Ryan Dahl (NodeJS), Typescript (Anders Hejlsberg/Microsoft)
 - **Paradigm**: multi paradigm, mainly functional
 
-NodeJS is probably one of the most common tools used in the backend web programming community, and that is not wihout reason.
+**NodeJS** is probably one of the most common tools used in the backend web programming community, and that is not wihout reason. There are tons upon tons of free services providing NodeJS-based runtime because the runtime/language is **that** versatile and lightweight, and I think should be crowned the **write once, run anywhere** title--rather than Java--because Javascript/Node does run everywhere.
+
+One of the most popular tool for creating web HTTP APIs for Node.JS is **Express**. It's an unopinionated web framework which is designed to create web APIs with great freedom, and the setup is very, very simple. Here is an example Express project:
+
+```js
+const express = require("express");
+const app = express();
+const port = 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
+```
+
+The above code will spin up an HTTP server on port 3000 inside the machine you are running your code in.
+
+To send JSON, just use the `res.json()` function:
+
+```js
+app.get("/", (req, res) => {
+  res.send({
+    hello: "world!",
+  });
+});
+```
+
+Very, very simple.
+
+One of the greatest thing about using NodeJS for backend server is being able to use **Typescript**. Dynamic languages like PHP or Python nowadays have something called **type hinting** in order for developers to be able to describe types for an object/variable/function return type. But in my opinion, a simple type hint feature is not really that powerful, and only helps developers in the development process. In the actual program runtime, these "types" are bound to change dynamically and oftentimes the developers are not aware of the "change" due to internal bugs or bugs from external APIs.
+
+Typescript took the "weak type hinting" problem to a whole different level. Instead of just type hinting, Typescript has a full-blown **compiler** which really catches type errors in a runtime, assuming that your program is fully written in Typescript. If you have some Javascript in your code, or there's a library you are using which still uses Javascript but you want to use it in a Typescript program, there's an **escape hatch** for you to use Javascript in a Typescript application, by using the `any` type.
+
+Typescript is actually a **transpiler** which converts your Typescript files to Javascript files before putting it in a NodeJS runtime. However, you can directly run a Typescript project directly in NodeJS by using `ts-node`, which setup is as simple as this:
+
+1. Create a NodeJS project
+
+```sh
+npm init
+```
+
+2. Install NPM dependencies
+
+```
+npm i @types/node @types/express ts-node
+```
+
+3. Create an `index.ts` file containing:
+
+```ts
+import express from "express";
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.send({ hello: "world!" });
+});
+
+app.listen(3000);
+```
+
+4. Add `start` script to `package.json` file
+
+```json
+...
+"scripts": {
+   "test": "echo \"Error: no test specified\" && exit 1",
+   "start": "ts-node index.ts"
+},
+...
+
+```
+
+5. Run your project
+
+```sh
+npm start
+```
+
+The server will spin up a Node Typescript project in `http://localhost:3000`.
+
+TODO: persistence layer
 
 ## 2. Dotnet / C#
 

@@ -10,7 +10,7 @@ However, recent developments of the C++ has some convenient features which you c
 
 But it still can be used for many, many applications other than healthcare devices or aviations, such as the field of Internet of Things, CNC machines, smart farming, smart trackers, etc etc.  
 
-With other high level tools like [MicroPython](#), [Go for Embedded](#), and [Embedded Rust](#) on the rise, and more powerful microcontrollers like ESP8266, ESP32-S2 and ESP32-C3 which offers many, many hardware resources (like 160MHz clock and 512KB-ish SRAM), people are becoming less afraid of using dynamic memory allocations in a microcontroller.
+With other high level tools like [MicroPython](/blog/modern-cpp-arduino/), [Go for Embedded](/blog/modern-cpp-arduino/), and [Embedded Rust](/blog/modern-cpp-arduino/) on the rise, and more powerful microcontrollers like ESP8266, ESP32-S2 and ESP32-C3 which offers many, many hardware resources (like 160MHz clock and 512KB-ish SRAM), people are becoming less afraid of using dynamic memory allocations in a microcontroller.
 
 Let's just jump into the ride and see what the modern C++ has to offer!
 
