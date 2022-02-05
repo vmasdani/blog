@@ -20,6 +20,10 @@ highlight_code = true
 # Put all your custom variables here
 profile_small = "tux.png"
 profile_large = "tux.png"
+
+accent = "royalblue"
+accent_light = "lightblue"
+
 footer_about = """
 Made with [Zola](https://www.getzola.org) and [Zola Simple Dev Blog theme](https://www.getzola.org/themes/simple-dev-blog/). Follow me on [Github](https://github.com/vmasdani)!
 """
