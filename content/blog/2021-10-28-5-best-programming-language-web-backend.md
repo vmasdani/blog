@@ -271,10 +271,12 @@ This is an example of a PHP code for creating database (Eloquent) model in Lumen
 $ php artisan make:migration create_employees_table
 ```
 
-2. Then you go to the newly created file, for example 
+2. Then you go to the newly created file, for example
+
 ```
 database/migrations/2022_02_05_114054_create_employees_table.php
 ```
+
 and define your database schema there.
 
 ```php
@@ -821,7 +823,7 @@ You might want to use the [ISO 8601](https://docs.microsoft.com/en-us/dotnet/sta
 
 and many other modern programming language features which makes programming fast enough for building prototype applications, but also possible to have fine-grained control for performance improvement.
 
-.NET 6 has a fantastic performance throughput. You can find the benchmarks at [TechEmpower Web Framework Benchmarks](https://www.techempower.com/benchmarks/) and for specifically .NET 6 improvements, you can look it up [here](https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-6/).  
+.NET 6 has a fantastic performance throughput. You can find the benchmarks at [TechEmpower Web Framework Benchmarks](https://www.techempower.com/benchmarks/) and for specifically .NET 6 improvements, you can look it up [here](https://devblogs.microsoft.com/dotnet/performance-improvements-in-net-6/).
 
 Working with [gRPC](https://grpc.io) is also nice with .NET Core, but maybe that is a room for another article.
 
