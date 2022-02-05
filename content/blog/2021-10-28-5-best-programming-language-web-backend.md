@@ -101,7 +101,7 @@ class PersonController(
 }
 ```
 
-Writing Spring Boot in Kotlin is very productive. Many of the reasons are because of:
+Writing Spring Boot codes using Kotlin is very productive. Many of the reasons are because of:
 
 - **function return inference** which can lead to writing very concise controller functions.
 - **dataclasses**
@@ -633,7 +633,7 @@ FYI: Generics is coming in Go version 1.18!
 
    In C#, you can do something like this, in case you want to get an information from deeply nested objects:
 
-   ```cs
+   ```csharp
    ...
 
    val pCompanyAddress = person
@@ -692,7 +692,7 @@ $ cd myapp
 
 Open `Program.cs`
 
-```cs
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -703,7 +703,7 @@ app.Run();
 
 Modify `"Hello World!"` to:
 
-```cs
+```csharp
 app.MapGet("/", () => "Hello People!");
 ```
 
@@ -734,7 +734,7 @@ $ dotnet tool install --global dotnet-ef
 
 Then in your `Program.cs`, put this code:
 
-```cs
+```csharp
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
