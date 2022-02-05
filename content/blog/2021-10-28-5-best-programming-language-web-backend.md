@@ -16,7 +16,7 @@ Here's the thing about picking the most powerful, best ever programming language
 Why **can't you**? Because there are always a few considerations in picking a programming language for a certain field of work/expertise. In my experience, some of them includes:
 
 1. **Popularity**  
-   Is the programming used by many people? Does it have big community? Are big companies using it, supporting it, and endorsing it?  
+   Is the language commonly used? Does it have big communities? Are big companies using it, supporting it, and endorsing it?  
    Popularity should be a strong factor in deciding which tech to use, because the bigger the community is, the easier for you to find a solution to a sometimes weird and quirky problem in a programming language, compiler, tooling, etc. You don't want to spend a few days trying to fix a weird bug when the fix is actually just adding a semicolon or comma, adding a single configuraton line, or simple stupid things that can cost you precious time when trying to fix it.
 
 2. **Demand**  
@@ -28,7 +28,7 @@ Why **can't you**? Because there are always a few considerations in picking a pr
 4. **Paradigm & use cases**  
    Always use the right tool for the right job. For example, you don't want to use low level languages (C, C++, Rust) to make a prototype of a proof of concept quickly, we have high level languages (Javascript, Python, Go) for that. And you also don't want to use a high level language for something like a smart watch, set top boxes, or a micro-controller because they tend to have very little memory, and in this case low level language is better than the high level ones.
 
-And now we are going to be reviewing 5 top programming languages according to the considerations above which works best for backend web programming.
+Now we are going to review the top 5 programming languages based on the considerations we have made above, which fit backend web programming.
 
 tl;dr:
 
@@ -271,7 +271,11 @@ This is an example of a PHP code for creating database (Eloquent) model in Lumen
 $ php artisan make:migration create_employees_table
 ```
 
-2. Then you go to the newly created file, for example `database/migrations/2022_02_05_114054_create_employees_table.php`, and define your database schema there.
+2. Then you go to the newly created file, for example 
+```
+database/migrations/2022_02_05_114054_create_employees_table.php
+```
+and define your database schema there.
 
 ```php
 <?php
